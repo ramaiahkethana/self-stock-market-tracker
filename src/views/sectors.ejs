@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sectors App</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+  <%- include('./nav') %>
+
+<div id="app" class="container mt-4">
+
+  <h2>Sectors</h2>
+  <ul class="list-group">
+    <li v-for="sector in sectors" :key="sector.id" class="list-group-item">
+      {{ sector.name }}
+    </li>
+  </ul>
+  
+  <!-- Create Sector Form -->
+  <div class="mt-4">
+    <h2>Create Sector</h2>
+    <form @submit.prevent="createSector">
+      <div class="form-group">
+        <label for="sectorName">Name:</label>
+        <input type="text" v-model="newSector.name" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Create Sector</button>
+    </form>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      sectors: [],
+      newSector: { name: '' }
+    },
+    mounted() {
+      // Fetch sectors from the backend API
+      this.fetchSectors();
+    },
+    methods: {
+      fetchSectors() {
+        // Replace the URL with your actual backend API endpoint for sectors
+        axios.get('http://localhost:3400/api/sectors')
+          .then(response => {
+            this.sectors = response.data;
+          })
+          .catch(error => {
+            console.error('Error fetching sectors', error);
+          });
+      },
+      createSector() {
+        // Replace the URL with your actual backend API endpoint for creating sectors
+        axios.post('http://localhost:3400/api/sectors', this.newSector)
+          .then(response => {
+            // Clear the form and fetch updated sectors
+            this.newSector = { name: '' };
+            this.fetchSectors();
+          })
+          .catch(error => {
+            console.error('Error creating sector', error);
+          });
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

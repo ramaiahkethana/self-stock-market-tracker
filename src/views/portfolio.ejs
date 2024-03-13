@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolios App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    .underline {
+      text-decoration: underline;
+    }
+  </style>
+  </head>
+  <body>
+    <%- include('./nav') %>
+
+    <div class="container mt-3">
+      <button type="button" class="btn btn-primary">Watch List 1</button>
+      <button type="button" class="btn">Watch List 2</button>
+    </div>
+
+    
+
+    <div id="app" class="container mt-3">
+      <h1 class="mb-4">Stock Portfolio</h1>
+
+      <ul class="mt-4">
+        <li
+          v-for="(stock, index) in stocks"
+          :key="index"
+          class="list-group-item"
+        >
+          <span class="mr-3">{{ stock.mc_code }}</span>
+          <span class="mr-3">{{ stock.quantity }}</span>
+          <span>{{ stock.average_price }}</span>
+        </li>
+      </ul>
+
+      <div class="form-group">
+        <label for="mc_code">MC Code:</label>
+        <input
+          type="text"
+          id="mc_code"
+          class="form-control"
+          v-model="newStock.mc_code"
+        />
+      </div>
+      <div class="form-group">
+        <label for="quantity">Quantity:</label>
+        <input
+          type="number"
+          id="quantity"
+          class="form-control"
+          v-model.number="newStock.quantity"
+        />
+      </div>
+      <div class="form-group">
+        <label for="average_price">Average Price:</label>
+        <input
+          type="number"
+          id="average_price"
+          class="form-control"
+          v-model.number="newStock.average_price"
+        />
+      </div>
+      <button @click="addStock" class="btn btn-primary">Add Stock</button>
+    </div>
+
+    <script>
+      new Vue({
+        el: "#app",
+        data: {
+          newStock: {
+            mc_code: 0,
+            quantity: 0,
+            average_price: 0,
+          },
+          stocks: [],
+        },
+        mounted() {
+          this.fetchStocks();
+        },
+        methods: {
+          addStock() {
+            this.stocks.push({
+              mc_code: this.newStock.mc_code,
+              quantity: this.newStock.quantity,
+              average_price: this.newStock.average_price,
+            });
+            // Call backend API to save the new stock data
+            axios
+              .post("http://localhost:3400/api/portfolio", this.newStock)
+              .then((response) => {
+                console.log("Stock added successfully");
+              })
+              .catch((error) => {
+                console.error("Error adding stock:", error);
+              });
+            this.clearForm();
+          },
+          clearForm() {
+            this.newStock.mc_code = "";
+            this.newStock.quantity = 0;
+            this.newStock.average_price = 0;
+          },
+          fetchStocks() {
+            // Call backend API to fetch list of stocks
+            axios
+              .get("http://localhost:3400/api/portfolio")
+              .then((response) => {
+                this.stocks = response.data;
+              })
+              .catch((error) => {
+                console.error("Error fetching stocks:", error);
+              });
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

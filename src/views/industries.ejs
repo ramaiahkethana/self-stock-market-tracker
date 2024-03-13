@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Industries App</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+  <%- include('./nav') %>
+
+<div id="app" class="container mt-4">
+
+  <h2>Industries</h2>
+  <ul class="list-group">
+    <li v-for="industry in industries" :key="industry.id" class="list-group-item">
+      {{ industry.name }} - {{ industry.sector }}
+    </li>
+  </ul>
+  
+  <!-- Create Industry Form -->
+  <div class="mt-4">
+    <h2>Create Industry</h2>
+    <form @submit.prevent="createIndustry">
+      <div class="form-group">
+        <label for="sector">Select Sector:</label>
+        <select v-model="newIndustry.sector_id" class="form-control" required>
+          <option v-for="sector in sectors" :key="sector._id" :value="sector._id">{{ sector.name }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" v-model="newIndustry.name" class="form-control" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Create Industry</button>
+    </form>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      industries: [],
+      newIndustry: { name: '', sector_id: '' },
+      sectors: []
+    },
+    mounted() {
+      // Fetch industries and sectors from the backend API
+      this.fetchIndustries();
+      this.fetchSectors();
+    },
+    methods: {
+      fetchIndustries() {
+        // Replace the URL with your actual backend API endpoint for industries
+        axios.get('http://localhost:3400/api/industries')
+          .then(response => {
+            this.industries = response.data;
+          })
+          .catch(error => {
+            console.error('Error fetching industries', error);
+          });
+      },
+      createIndustry() {
+        // Replace the URL with your actual backend API endpoint for creating industries
+        axios.post('http://localhost:3400/api/industries', this.newIndustry)
+          .then(response => {
+            // Clear the form and fetch updated industries
+            this.newIndustry = { name: '', sector: '' };
+            this.fetchIndustries();
+          })
+          .catch(error => {
+            console.error('Error creating industry', error);
+          });
+      },
+      fetchSectors() {
+        // Replace the URL with your actual backend API endpoint for sectors
+        axios.get('http://localhost:3400/api/sectors')
+          .then(response => {
+            this.sectors = response.data;
+          })
+          .catch(error => {
+            console.error('Error fetching sectors', error);
+          });
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

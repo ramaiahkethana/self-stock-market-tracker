@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events App</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+  <%- include('./nav') %>
+<div id="app" class="container mt-4">
+
+  <h2>Events</h2>
+  <ul class="list-group">
+    <li v-for="event in events" :key="event.id" class="list-group-item">
+      {{ event.name }} - Status: {{ event.status }}
+    </li>
+  </ul>
+  
+  <!-- Create Event Form -->
+  <div class="mt-4">
+    <h2>Create Event</h2>
+    <form @submit.prevent="createEvent">
+      <div class="form-group">
+        <label for="eventName">Name:</label>
+        <input type="text" v-model="newEvent.name" class="form-control" required>
+      </div>
+      <div class="form-group">
+        <label for="eventStatus">Status:</label>
+        <select v-model="newEvent.status" class="form-control" required>
+          <option value="not_started">Not Yet Started</option>
+          <option value="to_be_started">To Be Started</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Create Event</button>
+    </form>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      events: [],
+      newEvent: { name: '', status: '' }
+    },
+    mounted() {
+      // Fetch events from the backend API
+      this.fetchEvents();
+    },
+    methods: {
+      fetchEvents() {
+        // Replace the URL with your actual backend API endpoint for events
+        axios.get('http://localhost:3400/api/events')
+          .then(response => {
+            this.events = response.data;
+          })
+          .catch(error => {
+            console.error('Error fetching events', error);
+          });
+      },
+      createEvent() {
+        // Replace the URL with your actual backend API endpoint for creating events
+        axios.post('http://localhost:3400/api/events', this.newEvent)
+          .then(response => {
+            // Clear the form and fetch updated events
+            this.newEvent = { name: '', status: '' };
+            this.fetchEvents();
+          })
+          .catch(error => {
+            console.error('Error creating event', error);
+          });
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
